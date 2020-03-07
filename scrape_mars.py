@@ -26,15 +26,14 @@ def init_browser():
     return Browser("chrome", **executable_path, headless=False)
 
 
-# In[3]:
-
+# In[15]:
+mars_data = {}
 
 def scrape_nasa():
     
     """The function returns dictionary of title and paragraph text of the latest news on NASA website"""
     
 # Create lists for title and paragpraph.
-    _dict = {}
     titles = []
     para = []
     try:
@@ -52,11 +51,11 @@ def scrape_nasa():
         for paragraph in soup.find_all('div', class_='article_teaser_body'):
             para.append(paragraph.text)
 
-        _dict['title'] = titles[0]
-        _dict['para'] = para[0]
-        return _dict
+        mars_data['title'] = titles[0]
+        mars_data['para'] = para[0]
+        return mars_data
     except:
-        print("Ooops!!! Something went wrong, please try again!")
+        print(" scrape_nasa() Error: Ooops!!! Something went wrong, please try again!")
     finally:
         browser.quit()
 
@@ -73,7 +72,7 @@ scrape_nasa()
 # 
 # ### Small function to fetch the largesize image
 
-# In[5]:
+# In[16]:
 
 
 def scrape_image():
@@ -93,10 +92,10 @@ def scrape_image():
             if 'largesize' in anchors['data-fancybox-href']:
                 image_url = 'jpl.nasa.gov' + anchors['data-fancybox-href']
                 high_res_pics.append(image_url)
-        featured_image_url = high_res_pics[0]
-        return featured_image_url
+        mars_data["featured_image_url"] = high_res_pics[0]
+        return mars_data
     except: 
-        print('Ooops!!! Something went wrong, please try again!')
+        print('scrape_image() Error: Ooops!!! Something went wrong, please try again!')
     finally:
         browser.quit()
     
@@ -115,7 +114,7 @@ scrape_image()
 # 
 # ## Small function to scrape the weather data from Twitter
 
-# In[7]:
+# In[17]:
 
 
 def scrape_weather():
@@ -137,10 +136,10 @@ def scrape_weather():
                 weather_list.append(weather.p.getText().split('InSight')[1])
 
         #latest Mars Weather stats
-        mars_weather = weather_list[0].split('pic.twitter.com')[0]
-        return mars_weather
+        mars_data["mars_weather"] = weather_list[0].split('pic.twitter.com')[0]
+        return mars_data
     except:
-        print("Ooops!!! Something went wrong, please try again!")
+        print("scrape_weather() Error: Ooops!!! Something went wrong, please try again!")
 
 
 # In[8]:
@@ -153,7 +152,7 @@ scrape_weather()
 # 
 # ## Small function to scrape information from table
 
-# In[9]:
+# In[18]:
 
 
 def mars_facts():
@@ -164,12 +163,11 @@ def mars_facts():
         response = requests.get(url)
         soup = BeautifulSoup(response.content,'html.parser')
         table = soup.find_all('table')[0] 
-        df = pd.read_html(str(table))
-        mars_html_table = df[0].to_html()
-        mars_html_table
-        return mars_html_table
+        df = pd.read_html(str(table), index_col=0)
+        mars_data["mars_html_table"] = df[0].to_html()
+        return mars_data
     except:
-        print("Ooops!!! Something went wrong, please try again!")
+        print("mars_facts() Error: Ooops!!! Something went wrong, please try again!")
 
 
 # In[10]:
@@ -203,7 +201,7 @@ def img_getter(titles, url_list):
 
 # ## Small function to get images from Astropedia 
 
-# In[12]:
+# In[19]:
 
 
 def hemispheres():
@@ -228,10 +226,10 @@ def hemispheres():
 
         # Call image_getter
 
-        hemisphere_image_urls = img_getter(title_list, hemisphere_urls)
-        return hemisphere_image_urls
+        mars_data["hemisphere_image_urls"] = img_getter(title_list, hemisphere_urls)
+        return mars_data
     except:
-        print("Ooops!!! Something went wrong, please try again!")
+        print("hemispheres() Error: Ooops!!! Something went wrong, please try again!")
 
 
 # In[13]:

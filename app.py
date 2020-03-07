@@ -9,34 +9,24 @@ mongo = PyMongo(app)
 
 @app.route("/")
 def home():
-    scrape_data = mongo.db.collection.find()
-    return render_template("index.html", news=mars_app)
+    scrape_data = mongo.db.scrape_data.find_one()
+    return render_template("index.html", scrape_data=scrape_data)
 
 @app.route("/scrape")
 def scrape():
     # Run scraped functions
-    nasa_info = scrape_mars.scrape_nasa()
-    mars_image = scrape_mars.scrape_image()
-    mars_weather = scrape_mars.scrape_weather()
-    mars_html = scrape_mars.mars_facts()
-    hemispheres = scrape_mars.hemispheres()
+    scrape_data = mongo.db.scrape_data
+    mars_data = scrape_mars.scrape_nasa()
+    mars_data = scrape_mars.scrape_image()
+    mars_data = scrape_mars.scrape_weather()
+    mars_data = scrape_mars.mars_facts()
+    mars_data = scrape_mars.hemispheres()
+    scrape_data.update({}, mars_data, upsert=True)
 
-    # Store results into a dictionary
-    post = {
-        "title": nasa_info['title'],
-        "paragraph": nasa_info['para'],
-        "image": mars_image,
-        "weather": mars_weather,
-        "html": mars_html,
-        "images": hemispheres
-    }
-
-    # Insert scraped news into database
-    mongo.db.collection.insert_one(post)
 
     #Redirecting back to home page
     return redirect("/", code=302)
 
 
-if __name__ == "+__main__":
+if __name__ == "__main__":
     app.run(debug=True)

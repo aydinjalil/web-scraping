@@ -9,7 +9,7 @@
   <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">
   <style>
     .JumboHeaderImg{
-      background-image: url("./Resources/mars.jpg");
+      background-image: url("../Resources/mars.jpg");
       background-size: cover;
     }
   </style>
@@ -24,10 +24,10 @@
     </div>
 
     <!-- Craigslist Listings -->
-    <div class="row" id="craiglist-listings">
+    <div class="row" id="mars-data">
       <div class="col-md-12">
-        <h4 class="heading">{{listings.price}} {{listings.headline}}</h4>
-        <small>{{listings.hood}}</small>
+        <h4 class="heading">{{scrape_data.title}} {{scrape_data.para}}</h4>
+        <small>{{scrape_data.title}}</small>
       </div>
     </div>
 
