@@ -22,7 +22,7 @@ import time
 def init_browser():
     """This function open the Google Chrome browser when called"""
     
-    executable_path = {"executable_path": "C:/Users/aydin/Downloads/chromedriver_win32/chromedriver.exe"}
+    executable_path = {"executable_path": "./chromedriver_win32/chromedriver.exe"}
     return Browser("chrome", **executable_path, headless=False)
 
 
@@ -56,7 +56,7 @@ def scrape_nasa():
             mars_data['para'] = para[0]
             return mars_data
         except:
-            print(" scrape_nasa() Error: Ooops!!! Something went wrong, please try again!")
+            print(" scrape_nasa() Error: Ooops!!! Something went wrong, Trying again!")
         finally:
             browser.quit()
 
@@ -73,7 +73,7 @@ scrape_nasa()
 # 
 # ### Small function to fetch the largesize image
 
-# In[16]:
+
 
 
 def scrape_image():
@@ -97,13 +97,12 @@ def scrape_image():
             mars_data["featured_image_url"] = high_res_pics[0]
             return mars_data
         except:
-            print('scrape_image() Error: Ooops!!! Something went wrong, please try again!')
+            print('scrape_image() Error: Ooops!!! Something went wrong, Trying again!')
         finally:
             browser.quit()
     
 
 
-# In[6]:
 
 
 scrape_image()
@@ -116,7 +115,6 @@ scrape_image()
 # 
 # ## Small function to scrape the weather data from Twitter
 
-# In[17]:
 
 
 def scrape_weather():
@@ -142,10 +140,8 @@ def scrape_weather():
             mars_data["mars_weather"] = weather_list[0].split('pic.twitter.com')[0]
             return mars_data
         except:
-            print("scrape_weather() Error: Ooops!!! Something went wrong, please try again!")
+            print("scrape_weather() Error: Ooops!!! Something went wrong, Trying again!")
 
-
-# In[8]:
 
 
 scrape_weather()
@@ -155,7 +151,6 @@ scrape_weather()
 # 
 # ## Small function to scrape information from table
 
-# In[18]:
 
 
 def mars_facts():
@@ -172,10 +167,8 @@ def mars_facts():
             mars_data["mars_html_table"] = df.to_html()
             return mars_data
         except:
-            print("mars_facts() Error: Ooops!!! Something went wrong, please try again!")
+            print("mars_facts() Error: Ooops!!! Something went wrong, Trying again!")
 
-
-# In[10]:
 
 
 print(mars_facts())
@@ -183,7 +176,6 @@ print(mars_facts())
 
 # # 5. Mars Hemispheres
 
-# In[11]:
 
 
 def img_getter(titles, url_list):
@@ -206,7 +198,6 @@ def img_getter(titles, url_list):
 
 # ## Small function to get images from Astropedia 
 
-# In[19]:
 
 
 def hemispheres():
@@ -235,16 +226,13 @@ def hemispheres():
             mars_data["hemisphere_image_urls"] = img_getter(title_list, hemisphere_urls)
             return mars_data
         except:
-            print("hemispheres() Error: Ooops!!! Something went wrong, please try again!")
+            print("hemispheres() Error: Ooops!!! Something went wrong, Trying again!")
 
-
-# In[13]:
 
 
 hemispheres()
 
 
-# In[ ]:
 
 
 
