@@ -36,28 +36,29 @@ def scrape_nasa():
 # Create lists for title and paragpraph.
     titles = []
     para = []
-    try:
-        browser = init_browser()
-        url = "https://mars.nasa.gov/news/?page=0&per_page=40&order=publish_date+desc%2Ccreated_at+desc&search=&category=19%2C165%2C184%2C204&blank_scope=Latest"
-        browser.visit(url)
+    while True:
+        try:
+            browser = init_browser()
+            url = "https://mars.nasa.gov/news/?page=0&per_page=40&order=publish_date+desc%2Ccreated_at+desc&search=&category=19%2C165%2C184%2C204&blank_scope=Latest"
+            browser.visit(url)
+            time.sleep(5) # sleeping 5 seconds will let the website load properly so that we can fetch all the information needed.
+        # Scrape page into soup
+            html = browser.html
+            soup = BeautifulSoup(html, 'html.parser')
+        #     time.sleep(5)
+            for title in soup.find_all('div', class_='content_title'):
+                if title.a:
+                    titles.append(title.a.text)
+            for paragraph in soup.find_all('div', class_='article_teaser_body'):
+                para.append(paragraph.text)
 
-    # Scrape page into soup
-        html = browser.html
-        soup = BeautifulSoup(html, 'html.parser')
-    #     time.sleep(5)
-        for title in soup.find_all('div', class_='content_title'):
-            if title.a:
-                titles.append(title.a.text)
-        for paragraph in soup.find_all('div', class_='article_teaser_body'):
-            para.append(paragraph.text)
-
-        mars_data['title'] = titles[0]
-        mars_data['para'] = para[0]
-        return mars_data
-    except:
-        print(" scrape_nasa() Error: Ooops!!! Something went wrong, please try again!")
-    finally:
-        browser.quit()
+            mars_data['title'] = titles[0]
+            mars_data['para'] = para[0]
+            return mars_data
+        except:
+            print(" scrape_nasa() Error: Ooops!!! Something went wrong, please try again!")
+        finally:
+            browser.quit()
 
 
 # We can see that titles are greater in number than the paragraph texts. Since the assignment asks to fetch only the first title and associated text we just have to visually verify whether both elements are what we are looking for.  
@@ -82,22 +83,23 @@ def scrape_image():
     high_res_pics = []
     image_url = ''
     url = "https://www.jpl.nasa.gov/spaceimages/?search=&category=Mars"
-    try:
-        browser = init_browser()
-        browser.visit(url)
-        html = browser.html
-        soup = BeautifulSoup(html, 'html.parser')
+    while True:
+        try:
+            browser = init_browser()
+            browser.visit(url)
+            html = browser.html
+            soup = BeautifulSoup(html, 'html.parser')
 
-        for anchors in soup.find_all('a', class_='fancybox'):
-            if 'largesize' in anchors['data-fancybox-href']:
-                image_url = 'jpl.nasa.gov' + anchors['data-fancybox-href']
-                high_res_pics.append(image_url)
-        mars_data["featured_image_url"] = high_res_pics[0]
-        return mars_data
-    except: 
-        print('scrape_image() Error: Ooops!!! Something went wrong, please try again!')
-    finally:
-        browser.quit()
+            for anchors in soup.find_all('a', class_='fancybox'):
+                if 'largesize' in anchors['data-fancybox-href']:
+                    image_url = 'https://www.jpl.nasa.gov' + anchors['data-fancybox-href']
+                    high_res_pics.append(image_url)
+            mars_data["featured_image_url"] = high_res_pics[0]
+            return mars_data
+        except:
+            print('scrape_image() Error: Ooops!!! Something went wrong, please try again!')
+        finally:
+            browser.quit()
     
 
 
@@ -122,24 +124,25 @@ def scrape_weather():
     
     # list to store all available weather information. We will pick the latest one by simply saying weather_list[0]
     weather_list = []
-    url = "https://twitter.com/marswxreport?lang=en" 
-    try:
-        
-        html = requests.get(url).text
-        html = html.replace("\n", ", ")
-        soup = BeautifulSoup(html, 'html.parser')
+    url = "https://twitter.com/marswxreport?lang=en"
+    while True:
+        try:
 
-        # Scrape the website
+            html = requests.get(url).text
+            html = html.replace("\n", ", ")
+            soup = BeautifulSoup(html, 'html.parser')
 
-        for weather in soup.find_all('div', class_= "js-tweet-text-container"):
-            if "InSight" in weather.p.text:
-                weather_list.append(weather.p.getText().split('InSight')[1])
+            # Scrape the website
 
-        #latest Mars Weather stats
-        mars_data["mars_weather"] = weather_list[0].split('pic.twitter.com')[0]
-        return mars_data
-    except:
-        print("scrape_weather() Error: Ooops!!! Something went wrong, please try again!")
+            for weather in soup.find_all('div', class_= "js-tweet-text-container"):
+                if "InSight" in weather.p.text:
+                    weather_list.append(weather.p.getText().split('InSight')[1])
+
+            #latest Mars Weather stats
+            mars_data["mars_weather"] = weather_list[0].split('pic.twitter.com')[0]
+            return mars_data
+        except:
+            print("scrape_weather() Error: Ooops!!! Something went wrong, please try again!")
 
 
 # In[8]:
@@ -159,15 +162,17 @@ def mars_facts():
     """This function scrapes the information about Mars and returns it in html format"""
     
     url = "https://space-facts.com/mars/"
-    try: 
-        response = requests.get(url)
-        soup = BeautifulSoup(response.content,'html.parser')
-        table = soup.find_all('table')[0] 
-        df = pd.read_html(str(table), index_col=0)
-        mars_data["mars_html_table"] = df[0].to_html()
-        return mars_data
-    except:
-        print("mars_facts() Error: Ooops!!! Something went wrong, please try again!")
+    while True:
+        try:
+            response = requests.get(url)
+            soup = BeautifulSoup(response.content,'html.parser')
+            table = soup.find_all('table')[0]
+            df = pd.read_html(str(table), flavor='bs4')
+            df = pd.DataFrame({'description': df[0][0], 'value': df[0][1]}).set_index('description')
+            mars_data["mars_html_table"] = df.to_html()
+            return mars_data
+        except:
+            print("mars_facts() Error: Ooops!!! Something went wrong, please try again!")
 
 
 # In[10]:
@@ -208,28 +213,29 @@ def hemispheres():
     """This function returns the images of the Mars Hemispheres. Calls function image_getter to obtain the urls"""
     
     url = "https://astrogeology.usgs.gov/search/results?q=hemisphere+enhanced&k1=target&v1=Mars"
-    try:
-    
-        response = requests.get(url)
-        soup = BeautifulSoup(response.content,'html.parser')
+    while True:
+        try:
+
+            response = requests.get(url)
+            soup = BeautifulSoup(response.content,'html.parser')
 
 
-        hemisphere_urls  = []
-        title_list = []
-        for items in soup.find_all('div', class_='item'):
-            title = items.div.h3.text.replace(' Enhanced', '')
+            hemisphere_urls  = []
+            title_list = []
+            for items in soup.find_all('div', class_='item'):
+                title = items.div.h3.text.replace(' Enhanced', '')
 
-        # Create urls by concatenating the start and the portion of url derived from href
+            # Create urls by concatenating the start and the portion of url derived from href
 
-            hemisphere_urls.append(url.split('search')[0] + items.a['href'])
-            title_list.append(title)
+                hemisphere_urls.append(url.split('search')[0] + items.a['href'])
+                title_list.append(title)
 
-        # Call image_getter
+            # Call image_getter
 
-        mars_data["hemisphere_image_urls"] = img_getter(title_list, hemisphere_urls)
-        return mars_data
-    except:
-        print("hemispheres() Error: Ooops!!! Something went wrong, please try again!")
+            mars_data["hemisphere_image_urls"] = img_getter(title_list, hemisphere_urls)
+            return mars_data
+        except:
+            print("hemispheres() Error: Ooops!!! Something went wrong, please try again!")
 
 
 # In[13]:
