@@ -11,7 +11,6 @@ mongo = PyMongo(app)
 def home():
     scrape_data = mongo.db.scrape_data.find_one()
     return render_template("index.html", scrape_data=scrape_data)
-
 @app.route("/scrape")
 def scrape():
     # Run scraped functions
@@ -21,6 +20,7 @@ def scrape():
     mars_data = scrape_mars.scrape_weather()
     mars_data = scrape_mars.mars_facts()
     mars_data = scrape_mars.hemispheres()
+    print(mars_data)
     scrape_data.update({}, mars_data, upsert=True)
 
 
